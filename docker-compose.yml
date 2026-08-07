@@ -1,0 +1,13 @@
+# Só pra testar localmente, sem precisar da instância EC2 enquanto você
+# desenvolve. Sobe um Qdrant do zero em http://localhost:6333.
+#
+# Uso: docker compose up -d
+services:
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - ./qdrant_storage_local:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__API_KEY: chave-local-de-teste

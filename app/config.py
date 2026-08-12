@@ -7,11 +7,21 @@ API no código — é assim que ela vaza pro GitHub sem querer.
 """
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def _strip_strings(cls, v):
+        # Campos colados manualmente no painel do Render (ou outro provedor)
+        # às vezes carregam uma quebra de linha ou espaço invisível no final
+        # — o suficiente pra virar "postgres\n" em vez de "postgres" e
+        # quebrar a conexão. Tira isso de toda variável de ambiente lida.
+        return v.strip() if isinstance(v, str) else v
 
     # --- Autenticação ---
     SECRET_KEY: str  # gere com: python -c "import secrets; print(secrets.token_hex(32))"

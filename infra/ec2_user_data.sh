@@ -18,7 +18,7 @@ chown ec2-user:ec2-user /home/ec2-user/qdrant_storage
 # que protege seu banco vetorial, já que ele vai ficar acessível pela
 # internet (o Render, no plano gratuito, não tem IP fixo pra restringir por
 # Security Group). Guarde essa mesma chave no QDRANT_API_KEY do seu .env.
-QDRANT_API_KEY="TROQUE_ESSA_CHAVE_POR_UMA_SENHA_FORTE"
+QDRANT_API_KEY="e7627db5c3e3500d61a2b1bf66bd6ead3d0e5b4e7835419c8476ce6de38fb6b8"
 
 docker run -d \
   --name qdrant \

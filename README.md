@@ -9,7 +9,7 @@ responde **só com base nesses documentos** e sempre cita a fonte.
 ```
 PDFs (manuais) --[scripts/ingest.py, roda 1x por atualização]--> Qdrant (AWS/EC2)
                                                                         │
-professor faz login (JWT) --> POST /chat --> busca no Qdrant --> GPT responde
+professor faz login (JWT) --> POST /chat --> busca no Qdrant --> Gemini responde
                                                                   citando a fonte
 ```
 
@@ -20,8 +20,8 @@ professor faz login (JWT) --> POST /chat --> busca no Qdrant --> GPT responde
   pedaços de texto dos PDFs já convertidos em vetor (embedding).
 - **Orquestração**: [LangChain](https://python.langchain.com) — cuida da
   busca por similaridade no Qdrant e do encadeamento retriever → prompt → LLM.
-- **LLM**: OpenAI (`gpt-4o-mini` por padrão), via `langchain-openai`.
-- **Embeddings**: também OpenAI (`text-embedding-3-small`) — provedor único
+- **LLM**: Google Gemini (`gemini-flash-latest` por padrão), via `langchain-google-genai`.
+- **Embeddings**: também Gemini (`gemini-embedding-001`) — provedor único
   de propósito, pra simplificar cobrança/gestão de chave. Trocar de
   provedor (chat ou embeddings) é mudar só `app/rag/chain.py`,
   `app/rag/relatorios.py` e/ou `app/rag/vectorstore.py`.
@@ -60,7 +60,7 @@ teacher_ai_agent/
 │   │   └── schemas.py
 │   ├── rag/
 │   │   ├── vectorstore.py       # conexão com o Qdrant
-│   │   ├── chain.py             # busca + prompt + ferramentas + chamada ao GPT
+│   │   ├── chain.py             # busca + prompt + ferramentas + chamada ao Gemini
 │   │   ├── relatorios.py        # relatório: API do Saldo+ ou última planilha
 │   │   └── prompts.py           # system prompt do agente
 │   ├── support/
@@ -94,8 +94,9 @@ copy .env.example .env
 
 Edite o `.env`: gere o `SECRET_KEY` com
 `python -c "import secrets; print(secrets.token_hex(32))"`, e preencha
-`OPENAI_API_KEY` (deixe `QDRANT_URL`/`QDRANT_API_KEY`
-como estão por enquanto — o passo 2 resolve isso pro teste local).
+`GOOGLE_API_KEY` (gere em https://aistudio.google.com/apikey — deixe
+`QDRANT_URL`/`QDRANT_API_KEY` como estão por enquanto — o passo 2 resolve
+isso pro teste local).
 
 ### 2. Testar localmente (sem AWS ainda)
 
@@ -129,9 +130,11 @@ cd "C:\Users\Cliente\Desktop\teacher_ai_agent"
 uvicorn app.main:app --reload
 ```
 
-Abra `http://localhost:8000/docs` — faça login em `/api/v1/login`, copie o
-`access_token`, clique em "Authorize" no Swagger e cole `Bearer <token>`, e
-teste `/api/v1/chat`.
+Abra `http://localhost:8000/docs`, clique em "Authorize" (o esquema é
+OAuth2PasswordBearer, então o próprio Swagger faz o login por você — não
+precisa colar token manual): preencha `username`/`password` do professor
+de teste, deixe `client_id`/`client_secret` em branco, e clique em
+"Authorize". Depois teste `/api/v1/chat`.
 
 ### 3. Subir o Qdrant de verdade na AWS
 
@@ -171,7 +174,7 @@ teste `/api/v1/chat`.
 ## Abertura de chamado e relatório de turma
 
 Além de responder com base nos PDFs, o agente tem duas ferramentas que ele
-mesmo decide quando usar (tool calling nativo da OpenAI — `app/rag/chain.py`):
+mesmo decide quando usar (tool calling nativo do Gemini — `app/rag/chain.py`):
 
 - **`abrir_chamado_de_suporte`**: quando o professor relata um problema real
   (acesso, erro no sistema, reclamação) que precisa de alguém da equipe
@@ -229,8 +232,10 @@ senha normal da conta).
   seletiva.
 - **Cadastrar um professor novo**: `python scripts/create_teacher.py --usuario ... --nome "..."`.
 - **Custo esperado por mês** (depois do free tier acabar): EC2 t3.micro
-  (~US$7-8) + o consumo da OpenAI (embeddings + chat com `gpt-4o-mini`,
-  ambos bem baratos por uso do dia a dia). Praticamente zero de
+  (~US$7-8). O consumo do Gemini (embeddings + chat com `gemini-flash-latest`)
+  fica dentro do tier gratuito do Google AI Studio pra um uso do dia a dia
+  desse tamanho — vale confirmar os limites atuais em
+  https://ai.google.dev/pricing antes de escalar. Praticamente zero de
   infraestrutura fixa.
 
 ## Segurança — pontos de atenção
@@ -244,5 +249,3 @@ senha normal da conta).
   mesma trocar a senha de alguém rodando `create_teacher.py` de novo
   (apagando o registro antigo antes) do que manter fluxo de recuperação de
   senha por e-mail.
-#   a g e n t e - d e - I a  
- 

@@ -27,19 +27,17 @@ class Settings(BaseSettings):
     QDRANT_API_KEY: str
     QDRANT_COLLECTION_NAME: str = "materiais_pedagogicos"
 
-    # --- LLM (Claude, via Anthropic) ---
-    ANTHROPIC_API_KEY: str
-    # Haiku é o modelo mais em conta da família Claude — bom ponto de partida
-    # pro custo de um agente que vai responder muita pergunta repetida do
-    # dia a dia. Se quiser respostas mais elaboradas, troque por claude-sonnet-5.
-    ANTHROPIC_MODEL: str = "claude-haiku-4-5-20251001"
-
-    # --- Embeddings (texto -> vetor, usado na ingestão e em toda pergunta) ---
-    # A Anthropic não tem endpoint próprio de embeddings; usamos a OpenAI aqui
-    # por ser simples e barata. (A própria Anthropic recomenda a Voyage AI
-    # como alternativa — dá pra trocar sem mexer no resto do pipeline.)
-    OPENAI_API_KEY: str
-    EMBEDDING_MODEL: str = "text-embedding-3-small"
+    # --- Google Gemini (chat + embeddings — provedor único, por escolha sua) ---
+    GOOGLE_API_KEY: str
+    # "gemini-flash-latest" é um alias mantido pelo Google que sempre aponta
+    # pro modelo flash atual (tier gratuito, suporta tool calling — usado
+    # pra abrir chamado e gerar relatório). Usar o alias em vez de fixar uma
+    # versão evita quebrar quando o Google descontinua um modelo específico
+    # (já aconteceu com gemini-2.0-flash e gemini-2.5-flash neste projeto).
+    # Pra produção, se quiser mais previsibilidade, fixe uma versão
+    # conferindo antes em ai.google.dev/gemini-api/docs/models.
+    GEMINI_CHAT_MODEL: str = "gemini-flash-latest"
+    GEMINI_EMBEDDING_MODEL: str = "models/gemini-embedding-001"
 
     # --- CORS: de onde o frontend (ex: GitHub Pages) pode chamar a API ---
     CORS_ORIGINS: str = "http://localhost:5500"  # separe por vírgula se tiver mais de uma origem

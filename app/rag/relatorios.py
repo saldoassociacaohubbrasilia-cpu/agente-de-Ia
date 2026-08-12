@@ -7,7 +7,7 @@ De propósito NÃO existe aqui um parser fixo pro formato exato dos dados —
 nem o schema da API do Saldo+, nem o de cada planilha, são garantidos de
 antemão (cada planilha pode ter colunas diferentes). Em vez disso, os dados
 são resumidos (estatísticas básicas, não linha por linha) e entregues como
-JSON pro próprio Claude organizar num texto legível pro professor. Isso é
+JSON pro próprio modelo organizar num texto legível pro professor. Isso é
 mais robusto a mudança de schema do que um parser Python engessado — o
 preço é confiar no bom senso do modelo pra interpretar os campos.
 """
@@ -16,7 +16,7 @@ import json
 
 import httpx
 import pandas as pd
-from langchain_anthropic import ChatAnthropic
+from langchain_google_genai import ChatGoogleGenerativeAI
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
@@ -106,7 +106,7 @@ def gerar_relatorio_turma(db: Session, teacher: Teacher) -> str:
             "(scripts/upload_planilha.py) ou configurar a integração com a API."
         )
 
-    llm = ChatAnthropic(model=settings.ANTHROPIC_MODEL, api_key=settings.ANTHROPIC_API_KEY, temperature=0.2)
+    llm = ChatGoogleGenerativeAI(model=settings.GEMINI_CHAT_MODEL, google_api_key=settings.GOOGLE_API_KEY, temperature=0.2)
     mensagens = [
         ("system", RELATORIO_SYSTEM_PROMPT),
         (

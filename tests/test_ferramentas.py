@@ -5,7 +5,7 @@ Testes das duas ferramentas novas:
 2. _resumir_planilha -> lê uma planilha salva como bytes e calcula as
    estatísticas básicas certas.
 3. O loop de tool-calling em app/rag/chain.answer_question -> testado com um
-   LLM "dublê" que simula o Claude pedindo pra chamar a ferramenta de
+   LLM "dublê" que simula o GPT pedindo pra chamar a ferramenta de
    chamado, sem precisar de chave de API real nem de rede.
 
 Rodar com: pytest
@@ -17,8 +17,7 @@ os.environ.setdefault("SECRET_KEY", "chave-de-teste")
 os.environ.setdefault("DATABASE_URL", "sqlite:///./test_teachers.db")
 os.environ.setdefault("QDRANT_URL", "http://localhost:6333")
 os.environ.setdefault("QDRANT_API_KEY", "chave-de-teste")
-os.environ.setdefault("ANTHROPIC_API_KEY", "chave-de-teste")
-os.environ.setdefault("OPENAI_API_KEY", "chave-de-teste")
+os.environ.setdefault("GOOGLE_API_KEY", "chave-de-teste")
 os.environ.setdefault("SMTP_HOST", "smtp.invalido.teste")
 os.environ.setdefault("SMTP_USER", "teste@teste.com")
 os.environ.setdefault("SMTP_PASSWORD", "chave-de-teste")
@@ -107,7 +106,7 @@ def test_resumir_planilha_filtra_por_turma_e_calcula_estatisticas():
 
 
 class _LLMFalso:
-    """Simula ChatAnthropic: bind_tools devolve ele mesmo, invoke consome uma lista de respostas roteirizadas."""
+    """Simula ChatGoogleGenerativeAI: bind_tools devolve ele mesmo, invoke consome uma lista de respostas roteirizadas."""
 
     def __init__(self, respostas):
         self._respostas = list(respostas)
@@ -142,7 +141,7 @@ def test_answer_question_abre_chamado_quando_llm_decide(monkeypatch):
         AIMessage(content="Abri um chamado pra você, a equipe entra em contato em breve.", tool_calls=[]),
     ]
 
-    monkeypatch.setattr("app.rag.chain.ChatAnthropic", lambda **kwargs: _LLMFalso(respostas_roteirizadas))
+    monkeypatch.setattr("app.rag.chain.ChatGoogleGenerativeAI", lambda **kwargs: _LLMFalso(respostas_roteirizadas))
     monkeypatch.setattr("app.rag.chain.get_vectorstore", lambda: _VectorstoreFalso())
 
     from app.rag.chain import answer_question

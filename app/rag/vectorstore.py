@@ -8,7 +8,7 @@ que só você vai administrar, isso pesou bastante na escolha.
 """
 from functools import lru_cache
 
-from langchain_openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
@@ -19,14 +19,11 @@ settings = get_settings()
 
 
 @lru_cache
-def get_embeddings() -> OpenAIEmbeddings:
-    # A Anthropic não tem endpoint próprio de embeddings — pra isso, a
-    # própria Anthropic recomenda a Voyage AI. Usamos OpenAI aqui por ser
-    # simples e barata; pra trocar por Voyage, troca só essa função (usar
-    # `langchain_voyageai.VoyageAIEmbeddings`) — o resto do pipeline
-    # (Qdrant, chain, ingestão) não muda nada, porque todos trabalham só
-    # com a interface genérica `Embeddings` do LangChain.
-    return OpenAIEmbeddings(model=settings.EMBEDDING_MODEL, api_key=settings.OPENAI_API_KEY)
+def get_embeddings() -> GoogleGenerativeAIEmbeddings:
+    # Mesmo provedor do chat (Gemini), só que fazendo texto -> vetor — não
+    # conversa com ninguém. Usado na ingestão dos PDFs e a cada pergunta,
+    # pra achar os trechos mais parecidos antes de montar o prompt.
+    return GoogleGenerativeAIEmbeddings(model=settings.GEMINI_EMBEDDING_MODEL, google_api_key=settings.GOOGLE_API_KEY)
 
 
 @lru_cache

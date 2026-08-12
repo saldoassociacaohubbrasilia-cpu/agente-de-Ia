@@ -1,7 +1,7 @@
 """
 A cadeia de RAG + ferramentas.
 
-Fluxo: pergunta -> busca no Qdrant -> Claude decide, com base no contexto e
+Fluxo: pergunta -> busca no Qdrant -> Gemini decide, com base no contexto e
 no system prompt, se (a) responde direto usando os trechos recuperados,
 (b) chama a ferramenta de abrir chamado, porque é um problema real que
 precisa de acompanhamento humano, ou (c) chama a ferramenta de gerar
@@ -11,10 +11,10 @@ Fica separado do router (app/routers/chat_router.py) de propósito: assim dá
 pra testar essa lógica sozinha, e o router consegue trocar essa função por
 um "dublê" nos testes (ver tests/test_auth.py e tests/test_ferramentas.py).
 """
-from langchain_anthropic import ChatAnthropic
 from langchain_core.documents import Document
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from langchain_core.tools import tool
+from langchain_google_genai import ChatGoogleGenerativeAI
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -92,7 +92,7 @@ def answer_question(question: str, teacher: Teacher, db: Session) -> dict:
 
     ferramentas = {"abrir_chamado_de_suporte": abrir_chamado_de_suporte, "gerar_relatorio": gerar_relatorio}
 
-    llm = ChatAnthropic(model=settings.ANTHROPIC_MODEL, api_key=settings.ANTHROPIC_API_KEY, temperature=0.2)
+    llm = ChatGoogleGenerativeAI(model=settings.GEMINI_CHAT_MODEL, google_api_key=settings.GOOGLE_API_KEY, temperature=0.2)
     llm_com_ferramentas = llm.bind_tools(list(ferramentas.values()))
 
     mensagens = [

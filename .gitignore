@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 *.db
 qdrant_storage_local/
+documentos/*.pdf

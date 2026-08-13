@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import Base, engine
-from app.routers import auth_router, chat_router, relatorios_router
+from app.routers import auth_router, chat_router, conversas_router, relatorios_router
 
 settings = get_settings()
 
@@ -43,4 +43,5 @@ def health() -> dict:
 
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(chat_router.router, prefix="/api/v1")
+app.include_router(conversas_router.router, prefix="/api/v1")
 app.include_router(relatorios_router.router, prefix="/api/v1")

@@ -54,7 +54,7 @@ teacher_ai_agent/
 │   ├── main.py                # monta a API FastAPI
 │   ├── config.py               # lê o .env
 │   ├── database.py             # SQLAlchemy (banco de LOGIN, não o vetorial)
-│   ├── models.py                # tabela Teacher
+│   ├── models.py                # tabelas Teacher, Planilha, Conversa, Mensagem
 │   ├── auth/
 │   │   ├── security.py          # hash de senha, JWT
 │   │   └── schemas.py
@@ -67,7 +67,8 @@ teacher_ai_agent/
 │   │   └── tickets.py           # abre chamado no banco + envia e-mail
 │   └── routers/
 │       ├── auth_router.py       # POST /login, GET /me
-│       ├── chat_router.py       # POST /chat (protegida)
+│       ├── chat_router.py       # POST /chat (protegida) — cria/continua uma conversa
+│       ├── conversas_router.py  # GET /conversas, GET /conversas/{id} (histórico)
 │       └── relatorios_router.py # POST /planilhas (upload, protegida)
 ├── scripts/
 │   ├── create_teacher.py       # cadastra professor (CLI)
@@ -76,7 +77,8 @@ teacher_ai_agent/
 ├── infra/
 │   └── ec2_user_data.sh        # cole na criação da instância EC2
 ├── tests/
-│   └── test_auth.py            # teste de fumaça (login + chat)
+│   ├── test_auth.py             # teste de fumaça (login + chat)
+│   └── test_ferramentas.py      # abrir_chamado, resumo de planilha, tool-calling do chain
 └── documentos/                  # coloque os PDFs aqui pra ingerir
 ```
 
@@ -135,6 +137,13 @@ OAuth2PasswordBearer, então o próprio Swagger faz o login por você — não
 precisa colar token manual): preencha `username`/`password` do professor
 de teste, deixe `client_id`/`client_secret` em branco, e clique em
 "Authorize". Depois teste `/api/v1/chat`.
+
+**Nota pra quem for integrar um frontend**: `POST /login` recebe
+`username`/`password` (nomes em inglês — exigência do padrão OAuth2 que o
+FastAPI/Swagger espera), mas `GET /me` devolve os campos em português
+(`usuario`, `nome_completo`, `escola`). Se for rodar um frontend local em
+outra porta (ex.: Vite em `5173`), adicione a origem em `CORS_ORIGINS` no
+`.env` — o `.env.example` já traz `http://localhost:5173` como exemplo.
 
 ### 3. Subir o Qdrant de verdade na AWS
 
@@ -221,6 +230,27 @@ Configure o SMTP no `.env` (`SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`,
 `SMTP_FROM`, `SUPPORT_EMAIL_TO`) — qualquer provedor serve, inclusive Gmail
 com uma "senha de app" (myaccount.google.com/apppasswords, não dá pra usar a
 senha normal da conta).
+
+## Histórico de conversas
+
+Cada pergunta feita em `POST /api/v1/chat` fica registrada, agrupada em
+"conversas" (pra montar uma lateral de histórico no front, tipo ChatGPT):
+
+- **Primeira pergunta**: mande `POST /api/v1/chat` sem `conversa_id`. O
+  backend cria uma conversa nova (título = início da pergunta) e devolve o
+  `conversa_id` junto da resposta.
+- **Perguntas seguintes da mesma conversa**: mande esse `conversa_id` de
+  volta no corpo da requisição pra continuar na mesma thread, em vez de
+  abrir uma nova.
+- **`GET /api/v1/conversas`**: lista as conversas do professor logado, mais
+  recente primeiro — só o resumo (id, título, data).
+- **`GET /api/v1/conversas/{id}`**: mensagens completas de uma conversa
+  (pergunta, resposta, fontes citadas e `chamado_id` se aquela resposta
+  abriu um chamado). Devolve 404 tanto se a conversa não existe quanto se
+  pertence a outro professor — nunca revela qual dos dois é o caso.
+
+Cada professor só enxerga as próprias conversas (`app/routers/conversas_router.py`
+filtra por `teacher_username` do token JWT).
 
 ## Manutenção do dia a dia
 

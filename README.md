@@ -26,22 +26,7 @@ professor faz login (JWT) --> POST /chat --> busca no Qdrant --> Gemini responde
   provedor (chat ou embeddings) é mudar só `app/rag/chain.py`,
   `app/rag/relatorios.py` e/ou `app/rag/vectorstore.py`.
 
-## Por que Qdrant numa EC2, e não outra opção
 
-Duas formas de ter um banco vetorial "de graça" na AWS:
-
-| Opção | Prós | Contras |
-|---|---|---|
-| **EC2 t3.micro + Qdrant (Docker)** ✅ escolhida | Free tier de 750h/mês por 12 meses (conta nova) + 30GB de EBS grátis. Depois do free tier, ~US$7-8/mês — tranquilo pro orçamento de uma ONG. Auth simples (1 variável de ambiente). | Você administra a instância (patches, updates, backup manual do volume). |
-| **Amazon OpenSearch Service** (k-NN) | Totalmente gerenciado, sem servidor pra cuidar. Também tem free tier de 750h + 10GB por 12 meses. | Setup de índice k-NN mais complexo. Depois do free tier, o menor domínio gerenciado sai bem mais caro (dezenas de dólares/mês) — pesado pro orçamento de longo prazo de uma ONG. |
-
-Pra um projeto pequeno, mantido por uma pessoa só, o EC2+Qdrant venceu por
-ser mais barato *depois* que o free tier acabar (que é quando o custo real
-aparece) e por não exigir aprender a modelar índice k-NN.
-
-**Importante**: os termos do AWS Free Tier mudam com frequência (a AWS já
-alterou esse modelo mais de uma vez nos últimos anos). Confirme as condições
-atuais em https://aws.amazon.com/free antes de lançar a instância.
 
 ## Estrutura do projeto
 

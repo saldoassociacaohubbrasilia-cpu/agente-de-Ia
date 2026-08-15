@@ -11,6 +11,7 @@ Uso:
 """
 import argparse
 import sys
+import time
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -22,6 +23,12 @@ from app.rag.vectorstore import ensure_collection, get_embeddings, get_vectorsto
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 150
+
+# O tier gratuito do gemini-embedding-001 tem limite de tokens/minuto (TPM).
+# Mandar tudo de uma vez estoura esse limite (erro 429); por isso a
+# ingestão vai em lotes pequenos com pausa entre eles.
+LOTE_TAMANHO = 20
+PAUSA_ENTRE_LOTES_SEGUNDOS = 20
 
 
 def carregar_pdfs(pasta: Path) -> list:
@@ -64,7 +71,14 @@ def main() -> None:
     ensure_collection(vector_size)
 
     vectorstore = get_vectorstore()
-    vectorstore.add_documents(pedacos)
+    total_lotes = (len(pedacos) + LOTE_TAMANHO - 1) // LOTE_TAMANHO
+    for i in range(0, len(pedacos), LOTE_TAMANHO):
+        lote = pedacos[i : i + LOTE_TAMANHO]
+        numero_lote = i // LOTE_TAMANHO + 1
+        print(f"Indexando lote {numero_lote}/{total_lotes} ({len(lote)} pedaços)...")
+        vectorstore.add_documents(lote)
+        if numero_lote < total_lotes:
+            time.sleep(PAUSA_ENTRE_LOTES_SEGUNDOS)
     print(f"Pronto! {len(pedacos)} pedaços indexados na coleção '{vectorstore.collection_name}' do Qdrant.")
 
 

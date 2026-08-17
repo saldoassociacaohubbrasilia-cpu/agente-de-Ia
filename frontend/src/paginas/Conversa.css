@@ -1,0 +1,224 @@
+.conversa-layout {
+  height: 100%;
+  display: flex;
+}
+
+/* --- Lateral --- */
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--saldo-azul);
+  color: var(--saldo-branco);
+  display: flex;
+  flex-direction: column;
+  padding: var(--espaco-md);
+}
+
+.sidebar-professor {
+  padding-bottom: var(--espaco-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: var(--espaco-md);
+}
+
+.sidebar-nome {
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-semibold);
+  font-size: var(--texto-md);
+}
+
+.sidebar-escola {
+  font-size: var(--texto-xs);
+  opacity: 0.8;
+}
+
+.sidebar-nova-conversa {
+  background: var(--saldo-laranja);
+  color: var(--saldo-branco);
+  font-weight: var(--peso-semibold);
+  padding: var(--espaco-sm);
+  border-radius: var(--raio-sm);
+  margin-bottom: var(--espaco-md);
+}
+
+.sidebar-lista {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar-lista ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-xs);
+}
+
+.sidebar-vazio {
+  font-size: var(--texto-sm);
+  opacity: 0.7;
+}
+
+.sidebar-item {
+  width: 100%;
+  text-align: left;
+  padding: var(--espaco-sm);
+  border-radius: var(--raio-sm);
+  color: var(--saldo-branco);
+  font-size: var(--texto-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item-ativo {
+  background: var(--saldo-verde);
+  font-weight: var(--peso-medium);
+}
+
+.sidebar-sair {
+  margin-top: var(--espaco-md);
+  padding: var(--espaco-sm);
+  font-size: var(--texto-sm);
+  color: var(--saldo-branco);
+  opacity: 0.8;
+  text-align: left;
+}
+
+.sidebar-sair:hover {
+  opacity: 1;
+}
+
+/* --- Painel de conversa --- */
+.conversa-painel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.conversa-erro {
+  background: var(--saldo-branco);
+  color: var(--saldo-rosa);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-medium);
+  padding: var(--espaco-sm) var(--espaco-md);
+  border-bottom: 1px solid var(--saldo-cinza);
+}
+
+/* --- Janela do chat --- */
+.janela-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--espaco-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-md);
+}
+
+.janela-chat-vazia,
+.janela-chat-carregando {
+  margin: auto;
+  color: var(--saldo-preto);
+  opacity: 0.6;
+  text-align: center;
+  font-size: var(--texto-sm);
+}
+
+.mensagem {
+  display: flex;
+  gap: var(--espaco-sm);
+  max-width: 640px;
+}
+
+.mensagem-professor {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.mensagem-agente {
+  align-self: flex-start;
+}
+
+.mensagem-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--saldo-verde);
+  color: var(--saldo-branco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--peso-bold);
+  font-size: var(--texto-lg);
+}
+
+.mensagem-corpo {
+  padding: var(--espaco-sm) var(--espaco-md);
+  border-radius: var(--raio-md);
+}
+
+.mensagem-professor .mensagem-corpo {
+  background: var(--saldo-azul);
+  color: var(--saldo-branco);
+}
+
+.mensagem-agente .mensagem-corpo {
+  background: var(--saldo-branco);
+  border: 1px solid var(--saldo-cinza);
+}
+
+.mensagem-texto {
+  white-space: pre-wrap;
+  font-size: var(--texto-md);
+}
+
+.mensagem-digitando {
+  opacity: 0.6;
+}
+
+.mensagem-fontes {
+  list-style: none;
+  margin-top: var(--espaco-sm);
+  padding-top: var(--espaco-sm);
+  border-top: 1px solid var(--saldo-cinza);
+  font-size: var(--texto-xs);
+  opacity: 0.75;
+}
+
+.mensagem-chamado {
+  margin-top: var(--espaco-sm);
+  font-size: var(--texto-xs);
+  font-weight: var(--peso-medium);
+  color: var(--saldo-rosa);
+}
+
+/* --- Caixa de entrada --- */
+.caixa-de-entrada {
+  display: flex;
+  gap: var(--espaco-sm);
+  padding: var(--espaco-md);
+  border-top: 1px solid var(--saldo-cinza);
+  background: var(--saldo-branco);
+}
+
+.caixa-de-entrada textarea {
+  flex: 1;
+  resize: none;
+  padding: var(--espaco-sm);
+  border: 1px solid var(--saldo-cinza);
+  border-radius: var(--raio-sm);
+  background: var(--saldo-cinza);
+  max-height: 120px;
+}
+
+.caixa-de-entrada button {
+  background: var(--saldo-laranja);
+  color: var(--saldo-branco);
+  font-weight: var(--peso-semibold);
+  padding: 0 var(--espaco-lg);
+  border-radius: var(--raio-sm);
+}

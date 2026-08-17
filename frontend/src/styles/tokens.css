@@ -1,0 +1,44 @@
+/*
+  Tokens de marca do Saldo+. Nenhuma cor ou tamanho de fonte deve ser escrito
+  solto em outro arquivo CSS — sempre via uma dessas variáveis. Precisa de um
+  tom novo? Crie a variável aqui, não no componente.
+*/
+:root {
+  /* --- Paleta --- */
+  --saldo-azul: #002364; /* cor dominante: lateral, header, balão do usuário, títulos */
+  --saldo-verde: #11b2a8; /* acento da marca: "+" do logo, avatar do agente, foco, links */
+  --saldo-laranja: #f08105; /* ação principal (botão de enviar), com parcimônia */
+  --saldo-rosa: #e72486; /* alertas e erros */
+  --saldo-preto: #1c1c1c; /* texto */
+  --saldo-cinza: #f1f1f1; /* fundo de superfície */
+  --saldo-branco: #ffffff;
+
+  /* --- Tipografia --- */
+  /* Provisórias — quando a fonte oficial da marca for confirmada, troca só aqui. */
+  --fonte-titulo: 'Montserrat', sans-serif;
+  --fonte-corpo: 'Inter', sans-serif;
+
+  --texto-xs: 12px;
+  --texto-sm: 14px;
+  --texto-md: 16px;
+  --texto-lg: 22px;
+  --texto-xl: 28px;
+  --texto-2xl: 34px;
+  --texto-3xl: 44px;
+
+  --peso-regular: 400;
+  --peso-medium: 500;
+  --peso-semibold: 600;
+  --peso-bold: 700;
+  --peso-extrabold: 800;
+
+  /* --- Espaçamento e forma --- */
+  --espaco-xs: 4px;
+  --espaco-sm: 8px;
+  --espaco-md: 16px;
+  --espaco-lg: 24px;
+  --espaco-xl: 32px;
+  --raio-sm: 8px;
+  --raio-md: 12px;
+  --raio-lg: 20px;
+}

@@ -88,3 +88,15 @@ class Mensagem(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     conversa: Mapped["Conversa"] = relationship(back_populates="mensagens")
+
+
+class PasswordResetToken(Base):
+    """Token de uso único pra redefinir senha — expira rápido e é apagado assim que usado (ou quando expira)."""
+
+    __tablename__ = "password_reset_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    teacher_username: Mapped[str] = mapped_column(String(80), index=True)
+    token: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))

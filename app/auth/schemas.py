@@ -17,3 +17,12 @@ class TeacherOut(BaseModel):
     escola: str | None = Field(default=None, validation_alias="school")
 
     model_config = {"from_attributes": True, "populate_by_name": True}
+
+
+class EsqueciSenhaRequest(BaseModel):
+    usuario: str
+
+
+class RedefinirSenhaRequest(BaseModel):
+    token: str
+    nova_senha: str = Field(..., min_length=8)

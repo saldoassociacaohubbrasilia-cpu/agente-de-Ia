@@ -1,0 +1,121 @@
+@import './tokens.css';
+
+/* --- Reset básico --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--saldo-cinza);
+  color: var(--saldo-preto);
+  font-family: var(--fonte-corpo);
+  font-size: var(--texto-md);
+  font-weight: var(--peso-regular);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fonte-titulo);
+  color: var(--saldo-azul);
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+a {
+  color: var(--saldo-verde);
+}
+
+/* --- Acessibilidade: foco visível no teclado --- */
+:focus-visible {
+  outline: 3px solid var(--saldo-verde);
+  outline-offset: 2px;
+  border-radius: var(--raio-sm);
+}
+
+/* Texto claro só é usado sobre o azul — nunca sobre verde/laranja (contraste). */
+.sobre-azul {
+  background: var(--saldo-azul);
+  color: var(--saldo-branco);
+}
+
+/* Some visualmente mas continua acessível a leitor de tela. */
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- Barra "+": assinatura visual da marca, faixa fina de cruzes coloridas --- */
+.barra-mais {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+  line-height: 1;
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-bold);
+  font-size: var(--texto-lg);
+  user-select: none;
+}
+
+.barra-mais span:nth-child(4n + 1) {
+  color: var(--saldo-verde);
+}
+
+.barra-mais span:nth-child(4n + 2) {
+  color: var(--saldo-laranja);
+}
+
+.barra-mais span:nth-child(4n + 3) {
+  color: var(--saldo-rosa);
+}
+
+.barra-mais span:nth-child(4n + 4) {
+  color: var(--saldo-azul);
+}

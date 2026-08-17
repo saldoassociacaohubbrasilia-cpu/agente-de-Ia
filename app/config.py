@@ -52,6 +52,10 @@ class Settings(BaseSettings):
     # --- CORS: de onde o frontend (ex: GitHub Pages) pode chamar a API ---
     CORS_ORIGINS: str = "http://localhost:5500"  # separe por vírgula se tiver mais de uma origem
 
+    # --- Frontend: usado só pra montar o link de redefinição de senha no e-mail ---
+    FRONTEND_URL: str = "http://localhost:5173"
+    RESET_TOKEN_EXPIRE_MINUTES: int = 30
+
     # --- E-mail (abertura de chamado) ---
     # Qualquer provedor SMTP serve — Gmail com "senha de app", Outlook, etc.
     SMTP_HOST: str

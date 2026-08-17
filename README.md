@@ -63,8 +63,15 @@ teacher_ai_agent/
 │   └── ec2_user_data.sh        # cole na criação da instância EC2
 ├── tests/
 │   ├── test_auth.py             # teste de fumaça (login + chat)
-│   └── test_ferramentas.py      # abrir_chamado, resumo de planilha, tool-calling do chain
-└── documentos/                  # coloque os PDFs aqui pra ingerir
+│   ├── test_ferramentas.py      # abrir_chamado, resumo de planilha, tool-calling do chain
+│   └── test_password_reset.py   # esqueci senha: token válido/inválido/expirado/uso único
+├── documentos/                  # coloque os PDFs aqui pra ingerir
+└── frontend/                    # React + Vite — interface pro professor (login, chat, histórico)
+    ├── src/
+    │   ├── paginas/              # Login, Conversa, EsqueciSenha, RedefinirSenha
+    │   ├── componentes/          # Sidebar, JanelaChat, Mensagem, BarraMais
+    │   └── lib/api.js             # único arquivo que fala com o backend
+    └── vite.config.js
 ```
 
 ## Passo a passo
@@ -107,7 +114,7 @@ Cadastre um professor de teste:
 
 ```
 cd "C:\Users\Cliente\Desktop\teacher_ai_agent"
-python scripts/create_teacher.py --usuario maria.teste --nome "Maria Teste"
+python scripts/create_teacher.py --usuario maria.teste --nome "Maria Teste" --email maria.teste@escola.com
 ```
 
 Suba a API:
@@ -129,6 +136,19 @@ FastAPI/Swagger espera), mas `GET /me` devolve os campos em português
 (`usuario`, `nome_completo`, `escola`). Se for rodar um frontend local em
 outra porta (ex.: Vite em `5173`), adicione a origem em `CORS_ORIGINS` no
 `.env` — o `.env.example` já traz `http://localhost:5173` como exemplo.
+
+#### Rodar o frontend (pasta `frontend/`)
+
+```
+cd "C:\Users\Cliente\Desktop\teacher_ai_agent\frontend"
+npm install
+npm run dev
+```
+
+Abre em `http://localhost:5173`. Por padrão já aponta pro backend em
+`http://localhost:8000/api/v1` (ver `frontend/src/lib/api.js`) — se
+precisar mudar, crie `frontend/.env.local` com
+`VITE_API_BASE_URL=http://outra-url/api/v1`.
 
 ### 3. Subir o Qdrant de verdade na AWS
 
@@ -237,6 +257,31 @@ Cada pergunta feita em `POST /api/v1/chat` fica registrada, agrupada em
 Cada professor só enxerga as próprias conversas (`app/routers/conversas_router.py`
 filtra por `teacher_username` do token JWT).
 
+## Esqueci minha senha
+
+Diferente da decisão original deste projeto (recuperação de senha era só
+via `create_teacher.py`), agora existe um fluxo self-service completo:
+
+1. Na tela de login, o professor clica em "Esqueci minha senha" e informa
+   o usuário. **`POST /api/v1/esqueci-senha`** sempre devolve `204`, exista
+   ou não o usuário — a rota nunca revela quem está cadastrado.
+2. Se o usuário existir, o backend gera um token de uso único
+   (`PasswordResetToken`, expira em `RESET_TOKEN_EXPIRE_MINUTES`, 30min por
+   padrão), grava no banco e manda um e-mail (mesmo SMTP da abertura de
+   chamado) com um link pro frontend: `{FRONTEND_URL}/?token=...`. Usar
+   query param na raiz em vez de uma rota própria (`/redefinir-senha`) foi
+   proposital — funciona em qualquer hospedagem estática (Vercel, Netlify,
+   GitHub Pages) sem precisar configurar fallback de rota de SPA.
+3. O frontend detecta o `?token=` na URL (`frontend/src/App.jsx`) e mostra
+   a tela de nova senha, independente do professor estar logado ou não.
+4. **`POST /api/v1/redefinir-senha`** troca a senha se o token for válido
+   e ainda não tiver expirado/sido usado; devolve `400` caso contrário. O
+   token é apagado do banco depois de usado (ou quando expira) — sempre de
+   uso único.
+
+Configure `FRONTEND_URL` no `.env` de produção pra bater com a URL real do
+frontend hospedado (senão o link do e-mail aponta pro `localhost`).
+
 ## Manutenção do dia a dia
 
 - **Adicionar/atualizar um manual**: coloque o PDF em `documentos/` e rode
@@ -259,8 +304,9 @@ filtra por `teacher_username` do token JWT).
   **é a API key que protege os dados**, então trate ela como senha.
 - O JWT expira em 8h (`ACCESS_TOKEN_EXPIRE_MINUTES`) — professor precisa
   logar de novo no dia seguinte.
-- Não existe rota de "esqueci minha senha" nem de auto-cadastro, de
-  propósito — pra esse tamanho de time, é mais simples e mais seguro você
-  mesma trocar a senha de alguém rodando `create_teacher.py` de novo
-  (apagando o registro antigo antes) do que manter fluxo de recuperação de
-  senha por e-mail.
+- Existe recuperação de senha por e-mail (`POST /esqueci-senha` +
+  `POST /redefinir-senha`, ver seção "Esqueci minha senha" acima) — token
+  de uso único, expira rápido, e a rota nunca revela quais usuários estão
+  cadastrados. Ainda não existe auto-cadastro, de propósito: quem decide
+  quem tem acesso ao sistema continua sendo você, rodando
+  `create_teacher.py` manualmente.

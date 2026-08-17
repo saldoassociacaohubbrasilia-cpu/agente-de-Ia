@@ -1,0 +1,33 @@
+.app-carregando {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--fonte-titulo);
+  color: var(--saldo-azul);
+}
+
+.app-erro-conexao {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-md);
+  padding: var(--espaco-lg);
+  text-align: center;
+}
+
+.app-erro-conexao p {
+  color: var(--saldo-rosa);
+  font-weight: var(--peso-medium);
+  max-width: 480px;
+}
+
+.app-erro-conexao button {
+  background: var(--saldo-laranja);
+  color: var(--saldo-branco);
+  font-weight: var(--peso-semibold);
+  padding: var(--espaco-sm) var(--espaco-lg);
+  border-radius: var(--raio-sm);
+}
